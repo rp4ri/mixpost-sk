@@ -2,8 +2,9 @@ import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { db } from './db.js';
 import { env } from '$env/dynamic/private';
+import { building } from '$app/environment';
 
-export const auth = betterAuth({
+export const auth = building ? undefined! : betterAuth({
 	database: drizzleAdapter(db, {
 		provider: 'pg'
 	}),

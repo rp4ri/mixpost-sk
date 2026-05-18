@@ -6,10 +6,10 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 WORKDIR /app
 
 COPY package.json pnpm-lock.yaml .npmrc ./
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --ignore-scripts
 
 COPY . .
-RUN pnpm build
+RUN node node_modules/esbuild/install.js 2>/dev/null; pnpm exec svelte-kit sync && pnpm build
 
 FROM node:22-slim AS production
 

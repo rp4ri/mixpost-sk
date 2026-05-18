@@ -2,10 +2,11 @@ import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } fro
 import { env } from '$env/dynamic/private';
 import { writeFile, readFile, unlink, mkdir } from 'fs/promises';
 import { join } from 'path';
+import { building } from '$app/environment';
 
-const disk = env.MIXPOST_DISK ?? 'local';
+const disk = building ? 'local' : (env.MIXPOST_DISK ?? 'local');
 
-const s3 = disk === 's3'
+const s3 = (!building && disk === 's3')
 	? new S3Client({
 			region: env.AWS_DEFAULT_REGION ?? 'us-east-1',
 			credentials: {
@@ -15,7 +16,7 @@ const s3 = disk === 's3'
 		})
 	: null;
 
-const localBasePath = env.STORAGE_PATH ?? './storage';
+const localBasePath = building ? './storage' : (env.STORAGE_PATH ?? './storage');
 
 export async function putFile(path: string, data: Buffer, contentType?: string): Promise<string> {
 	if (disk === 's3' && s3) {
