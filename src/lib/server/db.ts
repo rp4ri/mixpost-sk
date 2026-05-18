@@ -1,12 +1,7 @@
-import { drizzle } from 'drizzle-orm/mysql2';
-import mysql from 'mysql2/promise';
+import { neon } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-http';
 import * as schema from './schema/index.js';
 import { env } from '$env/dynamic/private';
 
-const pool = mysql.createPool({
-	uri: env.DATABASE_URL,
-	waitForConnections: true,
-	connectionLimit: 10
-});
-
-export const db = drizzle(pool, { schema, mode: 'default' });
+const sql = neon(env.DATABASE_URL!);
+export const db = drizzle(sql, { schema });
