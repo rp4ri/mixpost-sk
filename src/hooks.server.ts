@@ -1,16 +1,15 @@
 import type { Handle } from '@sveltejs/kit';
 import { auth } from '$lib/server/auth.js';
-import { startWorkers } from '$lib/server/jobs/workers.js';
-import { startScheduler } from '$lib/server/scheduler.js';
-import { building } from '$app/environment';
+import { building, dev } from '$app/environment';
+import { env } from '$env/dynamic/private';
 
-if (!building) {
-	try {
-		startWorkers();
-		startScheduler();
-	} catch {
-		console.warn('Workers/scheduler not started (Redis may not be available)');
-	}
+if (!building && env.REDIS_URL) {
+	import('$lib/server/jobs/workers.js').then(m => m.startWorkers()).catch(() =>
+		console.warn('Workers not started (Redis unavailable)')
+	);
+	import('$lib/server/scheduler.js').then(m => m.startScheduler()).catch(() =>
+		console.warn('Scheduler not started (Redis unavailable)')
+	);
 }
 
 export const handle: Handle = async ({ event, resolve }) => {
