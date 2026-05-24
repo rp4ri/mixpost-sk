@@ -3,10 +3,12 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { db } from './db.js';
 import { env } from '$env/dynamic/private';
 import { building } from '$app/environment';
+import { user, session, authAccount as account, verification } from './schema/users.js';
 
 export const auth = building ? undefined! : betterAuth({
 	database: drizzleAdapter(db, {
-		provider: 'pg'
+		provider: 'pg',
+		schema: { user, session, account, verification }
 	}),
 	baseURL: env.APP_URL,
 	secret: env.SESSION_SECRET,
